@@ -44,8 +44,19 @@ namespace winrt::Unpaint::implementation
 
   fire_and_forget ImportLocalModelViewModel::BrowseModelAsync()
   {
-    FolderPicker folderPicker{};
-    _modelFolder = co_await folderPicker.PickSingleFolderAsync();
+    //  prevent windows 10/11 crash if local directory want to select
+     FolderPicker folderPicker{};
+     try
+     {
+        folderPicker.FileTypeFilter().Append(L".onnx");
+        _modelFolder = co_await folderPicker.PickSingleFolderAsync();
+     }
+     catch (...)
+     {        
+        folderPicker.FileTypeFilter().Append(L".onnx");
+        _status = _isValid ? L"" : L"Select Folder Exeption LINE 57";
+     }
+   
         
     if (_modelFolder)
     {
